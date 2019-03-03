@@ -15,14 +15,14 @@ public class wall : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate()
     {
-        transform.position = new Vector3(head.transform.position.x, head.transform.position.y, head.transform.position.z - 9f);
+        //transform.position = new Vector3(head.transform.position.x, head.transform.position.y, head.transform.position.z - 9f);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.name == "Box")
         {
-            Destroy(other.gameObject.transform.parent.gameObject);
+            other.gameObject.transform.parent.gameObject.SetActive(false);
         }
     }
 }

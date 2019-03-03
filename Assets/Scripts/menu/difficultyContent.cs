@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static Exchange;
 
 public class difficultyContent : MonoBehaviour {
-
+    public static bool updateDiff = false;
     public GameObject DifficultyObject;
-    public static Info selectedTwelveNoteChart;
-    public static string diffcultyLevel = "";
-    public static long diffcultyOffset = 0;
     // Use this for initialization
     void Start () {
 		
@@ -16,11 +14,9 @@ public class difficultyContent : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-       
-        if (songContent.selectedTwelveNoteChart != null)
+        if (updateDiff)
         {
-            selectedTwelveNoteChart = songContent.selectedTwelveNoteChart;
-            songContent.selectedTwelveNoteChart = null;
+            updateDiff = false;
 
             Transform[] ts1 = transform.GetComponentsInChildren<Transform>(true);
             foreach (Transform t in ts1)
@@ -31,10 +27,11 @@ public class difficultyContent : MonoBehaviour {
                 Destroy(t.gameObject);
             }
 
+
             foreach (DifficultyLevels info in selectedTwelveNoteChart.difficultyLevels)
             {
                 GameObject Song = Instantiate(DifficultyObject);
-                Song.transform.SetParent(gameObject.transform);
+                Song.transform.parent = gameObject.transform;
                 Song.transform.localScale = new Vector3(1, 1, 1);
                 Song.transform.localPosition = new Vector3(Song.transform.localPosition.x, Song.transform.localPosition.y, 0);
                 Song.name = info.difficulty;
@@ -80,25 +77,10 @@ public class difficultyContent : MonoBehaviour {
                 result = "Expert Drums";
                 break;
             default:
-                result = "Expert";
+                result = difficulty;
                 break;
         }
 
         return result;
-    }
-
-    public static void setDifficulty()
-    {
-        var regSprite = Resources.Load<Sprite>("Graphics/Trans");
-
-        Transform[] ts = GameObject.Find("difficultyContent").transform.GetComponentsInChildren<Transform>(true);
-        foreach (Transform t in ts)
-        {
-            if (t.gameObject.name == "selected")
-            {
-                Image realmSelect = t.gameObject.GetComponent<Image>();
-                realmSelect.sprite = regSprite;
-            }
-        }
-    }
+    }    
 }

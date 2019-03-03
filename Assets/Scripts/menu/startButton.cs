@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static Exchange;
 
 public class startButton : MonoBehaviour {
-    public GameModule GameModule;
 
     // Use this for initialization
     void Start () {
@@ -13,10 +14,13 @@ public class startButton : MonoBehaviour {
 
     void startTrack()
     {
-        GameObject newNote = Instantiate(Resources.Load("Prefabs/grid") as GameObject);
-        newNote.transform.position = new Vector3(0f, 2.6f, 32f);
-        newNote.GetComponent<TwelveNoteGame>().beginGame(difficultyContent.diffcultyLevel);
-    }
+        stopAllAudio();
+        mainManager.menus.SetActive(false);
+        mainManager.gameManager.gameObject.SetActive(true);
+        GameObject newGame = Instantiate(Resources.Load("Prefabs/grid") as GameObject, mainManager.gameManager.Game.transform);
+        newGame.transform.localPosition = new Vector3(0.30f, 1.272f, 0.69f);
+        mainManager.gameManager.grid = newGame;
+    } 
 
     // Update is called once per frame
     void Update () {

@@ -1,118 +1,124 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using static Exchange;
 
-public class GameModule : MonoBehaviour {
-
-    public GameObject Track;
-    public GameObject MenuObject;
-    public GameObject boss;
-    public GameObject wall;
-    public AudioSource Audio;
-    public AudioSource RhythmAudio;
-    public AudioSource GuitarAudio;
+public class GameModule : MonoBehaviour
+{
+    public AudioSource hit;
     public GameObject CameraEye;
     public GameObject CameraRig;
-    public AudioSource HitChallenge;
-    public AudioSource Hit;
-    public AudioSource portalHit;
     public GameObject controllerLeft;
-    public GameObject controllerRight;
+    public GameObject controllerRight;    
     public GameObject controllerMenu;
-    public GameObject LeftSaber;
-    public GameObject LeftHandModel;
-    public GameObject RightHandModel;
-    public GameObject LeftBlade;
-    public GameObject RightBlade;
-    public GameObject RightSaber;
-    public GameObject reminder;
-    public GameObject pointsObject;
-    public GameObject leftPortalText;
-    public GameObject rightPortalText;
-    public GameObject leftPos;
-    public GameObject rightPos;
-    public GameObject streakObject;
-    public GameObject multiplyerObject;
-    SteamVR_TrackedObject Lcontroller;
-    SteamVR_TrackedObject Rcontroller;
+    public GameObject LeftStick;
+    public GameObject Game;
+    public GameObject grid;
+    public GameObject wall;
+    public GameObject SpawnPoint;
+    public GameObject RightStick;
+    public GameObject Lpos;
+    public GameObject Rpos;
+    public GameObject FailBar;
+    public TextMesh pointsObject;
+    public TextMesh timeObject;
+    public TextMesh streakObject;
+    public TextMesh multiplyerObject;
+    public TextMesh currentPlayingSongName;
+    public TextMesh currentPlayingDiff;
     public uint streak = 0;
-    public bool inCube = false;
-    public bool isPlaying = false;
-    public bool LcontrollerSet = false;
-    public bool RcontrollerSet = false;
     public uint points = 0;
+    public uint failPoints = 50;
+    public uint FailTotal = 100;
     public uint multiplier = 1;
     public uint noteTotal = 0;
     public uint hitTotal = 0;
+    public Light[] Lights;
 
-
-    public void Vibrate(GameObject Controller, SteamVR_Controller.Device device)
+    void Start()
     {
-        device.TriggerHapticPulse(3900);
-        device.TriggerHapticPulse(3900);
-        device.TriggerHapticPulse(3900);
-        device.TriggerHapticPulse(3900);
+        if (mainManager.gameManager == null)
+        {
+            mainManager.gameManager = this;
+        }
     }
 
-    public void setLeftSaber()
+    void Awake()
     {
-        if (controllerLeft.GetComponent<FixedJoint>())
-            if (controllerLeft.GetComponent<FixedJoint>().connectedBody != null)
-                controllerLeft.GetComponent<FixedJoint>().connectedBody = null;
-
-        LeftSaber.transform.rotation = leftPos.transform.rotation;
-        LeftSaber.transform.position = leftPos.transform.position;
-
-        var jointL = AddFixedJoint(controllerLeft);
-        jointL.connectedBody = LeftSaber.GetComponent<Rigidbody>();
-
-        LeftHandModel.SetActive(false);
-
-        LcontrollerSet = true;
+        if (mainManager.gameManager == null)
+        {
+            mainManager.gameManager = this;
+        }
     }
 
-    public void setRightSaber()
+    public void UpdateScore(bool isMiss)
     {
-        if (controllerRight.GetComponent<FixedJoint>())
-            if (controllerRight.GetComponent<FixedJoint>().connectedBody != null)
-                controllerRight.GetComponent<FixedJoint>().connectedBody = null;
+        if (isMiss)
+        {
+            mainManager.gameManager.streak = 0;
+            mainManager.gameManager.multiplier = 1;
 
-        RightSaber.transform.rotation = rightPos.transform.rotation;
-        RightSaber.transform.position = rightPos.transform.position;
+            if (mainManager.gameManager.failPoints > 2)
+            {
+                mainManager.gameManager.failPoints = mainManager.gameManager.failPoints - 4;
+                mainManager.gameManager.FailBar.transform.localScale = new Vector3(mainManager.gameManager.failPoints / 100f, mainManager.gameManager.FailBar.transform.localScale.y, mainManager.gameManager.FailBar.transform.localScale.z);
+            }
+            else
+            {
+                //stopAllAudio();
+                //resetAudio();
+                //SceneManager.LoadScene("menu");
+            }
+        }
+        else
+        {
+            mainManager.gameManager.streak += 1;
+            mainManager.gameManager.hitTotal += 1;
+            mainManager.gameManager.points += 50 * mainManager.gameManager.multiplier;
 
-        var jointR = AddFixedJoint(controllerRight);
-        jointR.connectedBody = RightSaber.GetComponent<Rigidbody>();
+            if (mainManager.gameManager.failPoints < 100)
+            {
+                mainManager.gameManager.failPoints = mainManager.gameManager.failPoints + 2;
+                mainManager.gameManager.FailBar.transform.localScale = new Vector3(mainManager.gameManager.failPoints / 100f, 0.025051f, 0.024915f);
+            }
+        }
 
-        RightHandModel.SetActive(false);
-
-        RcontrollerSet = true;
+        mainManager.gameManager.pointsObject.text = mainManager.gameManager.points.ToString();
+        mainManager.gameManager.streakObject.text = mainManager.gameManager.streak.ToString();
+        mainManager.gameManager.multiplyerObject.text = "x " + mainManager.gameManager.multiplier.ToString();
     }
-    // Use this for initialization
-    void Start () {
-        Rcontroller = controllerRight.GetComponent<SteamVR_TrackedObject>();
-        Lcontroller = controllerLeft.GetComponent<SteamVR_TrackedObject>();
-    }
-	
-	// Update is called once per frame
-	void Update () {
-        if (isPlaying)
-            SetStreak();
 
-        if (Rcontroller.isValid && !RcontrollerSet)
-            setRightSaber();
-
-        if (Lcontroller.isValid && !LcontrollerSet)
-            setLeftSaber();
-
-        if (!Lcontroller.isValid)
-            LcontrollerSet = false;
-
-        if (!Rcontroller.isValid)
-            RcontrollerSet = false;
-    }
-    
-    void SetStreak()
+    public void MoveAndAttach(GameObject obj, GameObject objLoc, GameObject controller)
     {
+        if (!obj.activeInHierarchy)
+        {
+            obj.SetActive(true);
+        }
+
+        obj.transform.position = objLoc.transform.position;
+        obj.transform.rotation = objLoc.transform.rotation;
+
+        var jointL = AddFixedJoint(controller);
+        jointL.connectedBody = obj.GetComponent<Rigidbody>();
+    }
+
+    public void HideObjectInHand(GameObject obj)
+    {
+        if (!obj.activeInHierarchy)
+            return;
+
+        obj.SetActive(false);
+    }
+        
+    void FixedUpdate()
+    {
+        deltaTime += (Time.smoothDeltaTime - deltaTime) * 0.1f;
+    }
+    // Update is called once per frame
+    void Update()
+    {
+
         if (streak >= 10 && streak <= 19)
             multiplier = 2;
 
@@ -127,13 +133,23 @@ public class GameModule : MonoBehaviour {
 
         if (streak <= 9)
             multiplier = 1;
-    }
 
-    private FixedJoint AddFixedJoint(GameObject obj)
+    }
+    float deltaTime = 0.0f;
+
+    void OnGUI()
     {
-        FixedJoint fx = obj.AddComponent<FixedJoint>();
-        fx.breakForce = Mathf.Infinity;
-        fx.breakTorque = Mathf.Infinity;
-        return fx;
+        int w = Screen.width, h = Screen.height;
+
+        GUIStyle style = new GUIStyle();
+
+        Rect rect = new Rect(0, 0, w, h * 2 / 100);
+        style.alignment = TextAnchor.UpperLeft;
+        style.fontSize = h * 2 / 100;
+        style.normal.textColor = new Color(0.0f, 0.0f, 0.5f, 1.0f);
+        float msec = deltaTime * 1000.0f;
+        float fps = 1.0f / deltaTime;
+        string text = string.Format("{0:0.0} ms ({1:0.} fps)", msec, fps);
+        GUI.Label(rect, text, style);
     }
 }

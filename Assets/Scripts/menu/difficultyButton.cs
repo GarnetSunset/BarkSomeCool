@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static Exchange;
 
 public class difficultyButton : MonoBehaviour {
     
@@ -14,33 +15,16 @@ public class difficultyButton : MonoBehaviour {
 
     void GoToTarget()
     {
-        setDifficulty();
+        setSelectedDiff(gameObject);
 
-        foreach (DifficultyLevels info in difficultyContent.selectedTwelveNoteChart.difficultyLevels)
+
+        foreach (DifficultyLevels info in selectedTwelveNoteChart.difficultyLevels)
         {
             if (info.difficulty == gameObject.name)
             {
-                difficultyContent.diffcultyLevel = info.jsonPath;
-                difficultyContent.diffcultyOffset = info.offset;
+                diffcultyLevel = info.jsonPath;
+                mainManager.start.GetComponent<Button>().interactable = true;
             }
         }
-    }
-
-    public void setDifficulty()
-    {
-        difficultyContent.setDifficulty();
-        var tarSprite = Resources.Load<Sprite>("Graphics/CharacterObjectTargeted");
-
-        Transform[] ts = gameObject.transform.GetComponentsInChildren<Transform>(true);
-        foreach (Transform t in ts)
-        {
-            if (t.gameObject.name == "selected")
-            {
-                Image realmSelect = t.gameObject.GetComponent<Image>();
-                realmSelect.sprite = tarSprite;
-                GameObject.Find("start").GetComponent<Button>().interactable = true;
-            }
-        }
-
     }
 }

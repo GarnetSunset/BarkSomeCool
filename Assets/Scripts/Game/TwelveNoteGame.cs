@@ -4,152 +4,160 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using static Exchange;
 
-public class TwelveNoteGame : MonoBehaviour {
-    
-    string file = "";
-    bool paused = false;
-    public static bool playtrack = false;
-    public static bool makeHard = false;
+public class TwelveNoteGame : MonoBehaviour
+{
     public static List<NoteData> notes;
-    public static List<ObstacleData> obstacleDatas;
-    public static List<BeatSaberEvents> beatSaberEvents;
     public static float secPerBeat;
     public static float BeatPerSec;
     public static float dsptimesong;
     public static float songPosition;
     public static float songPosInBeats;
-    public static int nextIndex = 0;
-    GameModule game;
+    public string file = "";
+    public int noteIndex = 0;
+    public int starIndex = 0;
+    public bool paused = false;
+    public static bool playtrack = false;
+    float pauseSeconds = 0;
+    public bool isStar = false;
+
     // Use this for initialization
-    void Start () {
-        game = GameObject.Find("GameModule").GetComponent<GameModule>();
-    }
-
-    public void beginGame(string filename)
+    void Start()
     {
-        game = GameObject.Find("GameModule").GetComponent<GameModule>();
-        nextIndex = 0;
-        file = filename;
+        mainManager.saberBladeLeft.SetActive(true);
+        mainManager.saberBladeRight.SetActive(true);
 
-        game.MenuObject.SetActive(false);
-        game.LeftBlade.SetActive(true);
-        game.RightBlade.SetActive(true);
-        
-        SpawnObjects(difficultyContent.selectedTwelveNoteChart, file);
-        game.Audio.GetComponent<AudioSource>().time = 0;
-        playtrack = true;
-        game.Audio.GetComponent<AudioSource>().Play();
-    }
+        currentPlaybackSource = FindCurrentPlayback();
 
-    void SpawnObjects(Info infoForNotes, string file)
-    {
         notes = new List<NoteData>();
-        obstacleDatas = new List<ObstacleData>();
-        beatSaberEvents = new List<BeatSaberEvents>();
 
-        var info = File.ReadAllText(infoForNotes.path + "/" + file);
-        var te = JsonConvert.DeserializeObject<BeatSaberNoteInfo>(info);
-        BeatPerSec = difficultyContent.selectedTwelveNoteChart.beatsPerMinute / 60f;
-        secPerBeat = 60f / difficultyContent.selectedTwelveNoteChart.beatsPerMinute;
+        CreateNotes(selectedTwelveNoteChart, diffcultyLevel);
+
+        mainManager.gameManager.noteTotal = (uint)notes.Count;
+
+        setAllAudioTime(0);
+        playAllAudio(0);
+        playtrack = true;
+        //Invoke("StartTrack", 3f);
+    }
+
+    void CreateNotes(Info infoForNotes, string file)
+    {
+        string path = Path.GetDirectoryName(infoForNotes.path);
+
+        var info = File.ReadAllText(path + "/" + file);
+        var te = JsonConvert.DeserializeObject<NoteInfo>(info);
+
+        BeatPerSec = selectedTwelveNoteChart.beatsPerMinute / 60f;
+        secPerBeat = 60f / selectedTwelveNoteChart.beatsPerMinute;
+
         dsptimesong = (float)AudioSettings.dspTime;
 
         foreach (NoteData note in te._notes)
         {
-            SpawnNote(transform, note);
+            notes.Add(note);
         }
 
-        Comparison<NoteData> noteArrange = (x, y) => x._time.CompareTo(y._time);
-        notes.Sort(noteArrange);
-        
-        foreach (BeatSaberEvents _event in te._events)
+        Comparison<NoteData> comparison = (x, y) => x._time.CompareTo(y._time);
+        notes.Sort(comparison);
+        /*
+        foreach (Events _event in te._events)
         {
             SpawnEvent(transform, _event);
         }
 
-        Comparison<BeatSaberEvents> eventArrange = (x, y) => x.Time.CompareTo(y.Time);
-        beatSaberEvents.Sort(eventArrange);
-        
+        EffectsTrack.transform.position = EffectsTrackPos.transform.position;
+        EffectsTrack.transform.rotation = EffectsTrackPos.transform.rotation;
+
         foreach (ObstacleData _obstacle in te._obstacles)
         {
             SpawnObstacle(transform, _obstacle);
+        }*/
+    }
+
+    void StartTrack()
+    {
+        playtrack = true;
+    }
+
+    private void CreateNoteForGame(NoteData note, int index)
+    {
+        if (note._type == Hand.blue)
+        {
+            Spawner.SpawnPurpleNote(note, index, isStar);
+            return;
         }
 
-        Comparison<ObstacleData> obstacleArrange = (x, y) => x._time.CompareTo(y._time);
-        obstacleDatas.Sort(obstacleArrange);
+        if (note._type == Hand.red)
+        {
+            Spawner.SpawnRedNote(note, index, isStar);
+            return;
+        }
+
+        if (note._type == Hand.Bomb)
+        {
+            //Spawner.SpawnWhiteNote(note, index, isStar);
+            return;
+        }
     }
 
-    void SpawnNote(Transform parent, NoteData note)
+    public void endSong()
     {
-        notes.Add(note);
+        /*PacketWriter SubmitScores = new PacketWriter(Opcodes.SCORE_SUBMIT);
+        SubmitScores.WriteString(Exchange._currentSettings.UserName);
+        SubmitScores.WriteUInt32(Exchange.gameManager.points);
+        SubmitScores.WriteString(Exchange.currentGoodData.initialData.SongName);
+        SubmitScores.WriteString(Exchange.currentGoodData.initialData.Artist);
+        Exchange.mSocket.SendPacket(SubmitScores);*/
+        mainManager.saberBladeLeft.SetActive(true);
+        mainManager.saberBladeRight.SetActive(true);
+
+        
+        mainManager.menus.SetActive(true);
+        mainManager.gameManager.gameObject.SetActive(false);
+        Destroy(gameObject);
     }
 
-    void SpawnEvent(Transform parent, BeatSaberEvents note)
+    // Update is called once per frame
+    void Update()
     {
-        beatSaberEvents.Add(note);
-    }
+        songPosition = (float)(AudioSettings.dspTime - dsptimesong);
+        songPosInBeats = songPosition / secPerBeat;
 
-    void SpawnObstacle(Transform parent, ObstacleData note)
-    {
-        obstacleDatas.Add(note);
-    }
-
-    void FixedUpdate()
-    {
         if (playtrack)
         {
-            if (nextIndex < notes.Count && (notes[nextIndex]._time < (songPosInBeats - difficultyContent.selectedTwelveNoteChart.difficultyLevels[0].offset) + (4 * BeatPerSec)))
+            if (playtrack && currentPlaybackSource.isPlaying)
             {
-                GameObject newNote;
-                string tmp = "";
+                float offsetnow = selectedTwelveNoteChart.difficultyLevels[0].offset / 1000;
+                float timer = offsetnow + songPosition;
+                if (noteIndex < notes.Count && (notes[noteIndex]._time * secPerBeat) < timer + (4 * secPerBeat) && currentPlaybackSource.isPlaying)
+                {
+                    CreateNoteForGame(notes[noteIndex], noteIndex);
+                    noteIndex++;
+                }
+            }
 
-                if (notes[nextIndex]._type == Hand.blue)
-                    tmp = "Blue";
-
-                if (notes[nextIndex]._type == Hand.red)
-                    tmp = "Red";
-
-                if (notes[nextIndex]._type == Hand.Bomb)
-                    tmp = "Bomb";
-
-                if (notes[nextIndex]._type == Hand.blue && notes[nextIndex]._cutDirection == _cutType._any)
-                    tmp = "AnyBlue";
-
-                if (notes[nextIndex]._type == Hand.red && notes[nextIndex]._cutDirection == _cutType._any)
-                    tmp = "AnyRed";
-
-                newNote = Instantiate(Resources.Load("Prefabs/" + tmp) as GameObject);
-                newNote.name = nextIndex.ToString();
-                newNote.AddComponent<TwelveNoteCube>();
-                newNote.GetComponent<TwelveNoteCube>().note = notes[nextIndex];
-                newNote.GetComponent<TwelveNoteCube>().noteIndex = nextIndex;
-                newNote.transform.SetParent(gameObject.transform);
-
-                Vector3 position = new Vector3(game.boss.transform.position.x, game.boss.transform.position.y, game.boss.transform.position.z);
-
-                newNote.transform.position = position;
-                nextIndex++;
-            }    
-
-            /*if (controller11.GetComponent<SteamVR_TrackedController>().menuPressed)
+            /*if (mainManager.gameManager.controllerLeft.GetComponent<SteamVR_TrackedController>().menuPressed)
             {
                 playtrack = false;
-                Audio.GetComponent<AudioSource>().Pause();
-                controllerMenu.SetActive(true);
-                resetSaber(true);
-                Invoke("Paused", 0.5f);
+                pauseSeconds = currentPlaybackSource.time;
+                stopAllAudio();
+                mainManager.gameManager.controllerMenu.SetActive(true);
+                Invoke("Paused", 1f);
                 return;
             }*/
 
-            if (!game.Audio.GetComponent<AudioSource>().isPlaying)
+
+            if (noteIndex == notes.Count && !currentPlaybackSource.isPlaying)
+            {
                 endSong();
-
-
+            }
         }
 
         /*if (paused)
         {
-            if (controller11.GetComponent<SteamVR_TrackedController>().menuPressed)
+            if (mainManager.gameManager.controllerLeft.GetComponent<SteamVR_TrackedController>().menuPressed)
             {
                 paused = false;
                 Invoke("unPaused", 0.5f);
@@ -158,36 +166,4 @@ public class TwelveNoteGame : MonoBehaviour {
         }*/
     }
 
-    public void endSong()
-    {
-        playtrack = false;
-        game.MenuObject.SetActive(true);
-        game.LeftBlade.SetActive(false);
-        game.RightBlade.SetActive(false);
-        Destroy(gameObject);
-    }
-
-    // Update is called once per frame
-    void Update () {
-        songPosition = (float)(AudioSettings.dspTime - dsptimesong);
-        songPosInBeats = songPosition / secPerBeat;
-    }
-
-    public void stopAudio()
-    {
-        if (difficultyContent.selectedTwelveNoteChart.audioClip != null)
-        {
-            game.Audio.Stop();
-        }
-    }
-
-    public void playAudioAt(float delay)
-    {
-        if (difficultyContent.selectedTwelveNoteChart.audioClip != null)
-        {
-            game.Audio.PlayScheduled(AudioSettings.dspTime + delay);
-        }
-    }
-
-   
 }
