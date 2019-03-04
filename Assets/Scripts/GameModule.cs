@@ -27,6 +27,13 @@ public class GameModule : MonoBehaviour
     public TextMesh multiplyerObject;
     public TextMesh currentPlayingSongName;
     public TextMesh currentPlayingDiff;
+    public Renderer[] RightLazers;
+    public Renderer[] LeftLazers;
+    public Renderer[] TopLeftRightLazers;
+    public Renderer[] BackBottomLazers;
+    public Material RedMaterial;
+    public Material BlueMaterial;
+    public Material LightOff;
     public uint streak = 0;
     public uint points = 0;
     public uint failPoints = 50;

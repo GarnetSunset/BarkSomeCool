@@ -18,6 +18,7 @@ public class NoteJump : MonoBehaviour
     public Color startColor;
     public Color endColor;
     public Hand currentColor;
+    public _cutType _cutType;
     public Renderer ringRenderer;
     public Renderer lightingRenderer;
     GameObject noteGO;
@@ -29,7 +30,7 @@ public class NoteJump : MonoBehaviour
     void Start()
     {
         lerpTime = ((float)note._time - TwelveNoteGame.songPosInBeats) * TwelveNoteGame.secPerBeat;
-
+        _cutType = note._cutDirection;
         ringRenderer = GetComponent<Renderer>();
         startPos = transform.position;
 
@@ -118,7 +119,7 @@ public class NoteJump : MonoBehaviour
     }
     
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         lerpTime = (4 * TwelveNoteGame.secPerBeat) / currentPlaybackSource.pitch;
 
@@ -131,12 +132,7 @@ public class NoteJump : MonoBehaviour
             }
 
             secondLerpTime += Time.smoothDeltaTime;
-
-            if (secondLerpTime > 0.2f)
-            {                
-                mainManager.gameManager.UpdateScore(true); 
-            }
-
+            
             sexondPerc = secondLerpTime / lerpTime;
             DoEndLerps(sexondPerc);
             return;

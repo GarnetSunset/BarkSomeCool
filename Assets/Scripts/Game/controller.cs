@@ -14,15 +14,13 @@ public class controller : MonoBehaviour {
     public GameObject cutPlane;
     public Hand handColor;
     public Material crossMat;
-    Vector3 oldPos;
-    Vector3 newPos;
     NoteJump hitNote;
+    VelocityEstimator velocityEstimator;
     // Use this for initialization
     void Start () {
-        oldPos = ControllerTip.transform.position;
         controllerInHand = Controller.GetComponent<SteamVR_TrackedObject>();
-        //GetComponent<VelocityEstimator>().BeginEstimatingVelocity();
-
+        velocityEstimator = ControllerTip.GetComponent<VelocityEstimator>();
+        velocityEstimator.BeginEstimatingVelocity();
         if (mainManager._currentControllers == null)
         {
             mainManager._currentControllers = new List<controller>();
@@ -33,22 +31,15 @@ public class controller : MonoBehaviour {
 
         mainManager._currentControllers.Add(this);        
     }
-
-    public bool goingUp = false;
-    public bool goingDown = false;
-    public bool goingLeft = false;
-    public bool goingRight = false;
-    public bool goingDownLeft = false;
-    public bool goingDownRight = false;
-    public bool goingUpLeft = false;
-    public bool goingUpRight = false;
+    
     private void Awake()
     {
-        //GetComponent<VelocityEstimator>().BeginEstimatingVelocity();
+        velocityEstimator = ControllerTip.GetComponent<VelocityEstimator>();
+        velocityEstimator.BeginEstimatingVelocity();
     }
-    void FixedUpdate()
-    {
-        newPos = ControllerTip.transform.position;
+
+    // Update is called once per frame
+    void Update () {
 
         if (device == null)
         {
@@ -56,64 +47,15 @@ public class controller : MonoBehaviour {
             {
                 device = SteamVR_Controller.Input((int)controllerInHand.index);
             }
-        }
-
-        if (oldPos.y > newPos.y)
-        {
-            goingDown = true;
-            goingUp = false;
-
-            if(goingRight)
-            {
-                goingDownLeft = false;
-                goingDownRight = true;
-            }
-            else
-            {
-                goingDownRight = false;
-                goingDownLeft = true;
-            }
-        }
-        else
-        {
-            goingDown = false;
-            goingUp = true;
-
-            if (goingRight)
-            {
-                goingUpLeft = false;
-                goingUpRight = true;
-            }
-            else
-            {
-                goingUpRight = false;
-                goingUpLeft = true;
-            }
-        }
-
-        if (oldPos.x < newPos.x)
-        {
-            goingLeft = false;
-            goingRight = true;
-        }
-        else
-        {
-            goingRight = false;
-            goingLeft = true;
-        }
-
-        oldPos = newPos;
-    }
-
-    // Update is called once per frame
-    void Update () {
-        
+        }        
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.name == "Box")
         {
+            velocityEstimator.BeginEstimatingVelocity();
+
             hitNote = null;
 
             mainManager.Vibrate(Controller, device);
@@ -145,6 +87,10 @@ public class controller : MonoBehaviour {
                     {
                         mainManager.gameManager.UpdateScore(false);
                     }
+                    else
+                    {
+                        mainManager.gameManager.UpdateScore(true);
+                    }
 
                     hitNote.gameObject.SetActive(false);
                 }
@@ -159,22 +105,22 @@ public class controller : MonoBehaviour {
         {
             case _cutType._any:
                 return true;
-            case _cutType._bottomLeft:
-                return goingUpRight;
-            case _cutType._bottomRight:
-                return goingUpLeft;
+            case _cutType._bottomLeft:                
+                return (velocityEstimator.speed.y > 0.2f) && (velocityEstimator.speed.x < -0.2f);
+            case _cutType._bottomRight:                
+                return (velocityEstimator.speed.y > 0.2f) && (velocityEstimator.speed.x > 0.2f);
             case _cutType._down:
-                return goingDown;
+                return (velocityEstimator.speed.y < -0.2f);
             case _cutType._left:
-                return goingLeft;
+                return (velocityEstimator.speed.x < -0.2f);
             case _cutType._right:
-                return goingRight;
+                return (velocityEstimator.speed.x > 0.2f);
             case _cutType._topLeft:
-                return goingDownRight;
+                return (velocityEstimator.speed.y < -0.2f) && (velocityEstimator.speed.x < -0.2f);
             case _cutType._topRight:
-                return goingDownLeft;
+                return (velocityEstimator.speed.y < -0.2f) && (velocityEstimator.speed.x > 0.2f);
             case _cutType._up:
-                return goingUp;
+                return (velocityEstimator.speed.y > 0.2f);
             default:
                 return false;
         }

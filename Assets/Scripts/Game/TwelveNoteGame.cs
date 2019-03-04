@@ -9,6 +9,8 @@ using static Exchange;
 public class TwelveNoteGame : MonoBehaviour
 {
     public static List<NoteData> notes;
+    public static List<Events> noteEvents;
+    public static List<ObstacleData> noteObstilcales;
     public static float secPerBeat;
     public static float BeatPerSec;
     public static float dsptimesong;
@@ -16,7 +18,8 @@ public class TwelveNoteGame : MonoBehaviour
     public static float songPosInBeats;
     public string file = "";
     public int noteIndex = 0;
-    public int starIndex = 0;
+    public int eventIndex = 0;
+    public int obsticalIndex = 0;
     public bool paused = false;
     public static bool playtrack = false;
     float pauseSeconds = 0;
@@ -31,6 +34,8 @@ public class TwelveNoteGame : MonoBehaviour
         currentPlaybackSource = FindCurrentPlayback();
 
         notes = new List<NoteData>();
+        noteEvents = new List<Events>();
+        noteObstilcales = new List<ObstacleData>();
 
         CreateNotes(selectedTwelveNoteChart, diffcultyLevel);
 
@@ -59,26 +64,24 @@ public class TwelveNoteGame : MonoBehaviour
             notes.Add(note);
         }
 
-        Comparison<NoteData> comparison = (x, y) => x._time.CompareTo(y._time);
-        notes.Sort(comparison);
-        /*
+        Comparison<NoteData> NoteComparison = (x, y) => x._time.CompareTo(y._time);
+        notes.Sort(NoteComparison);
+        
         foreach (Events _event in te._events)
         {
-            SpawnEvent(transform, _event);
+            noteEvents.Add(_event);
         }
 
-        EffectsTrack.transform.position = EffectsTrackPos.transform.position;
-        EffectsTrack.transform.rotation = EffectsTrackPos.transform.rotation;
-
+        Comparison<Events> EventComparison = (x, y) => x.Time.CompareTo(y.Time);
+        noteEvents.Sort(EventComparison);
+        
         foreach (ObstacleData _obstacle in te._obstacles)
         {
-            SpawnObstacle(transform, _obstacle);
-        }*/
-    }
+            noteObstilcales.Add(_obstacle);
+        }
 
-    void StartTrack()
-    {
-        playtrack = true;
+        Comparison<ObstacleData> ObsticaleComparison = (x, y) => x._time.CompareTo(y._time);
+        noteObstilcales.Sort(ObsticaleComparison);
     }
 
     private void CreateNoteForGame(NoteData note, int index)
@@ -101,6 +104,124 @@ public class TwelveNoteGame : MonoBehaviour
             return;
         }
     }
+    private void ObstacleForGame(ObstacleData note, int index)
+    {
+        
+    }
+    private void EventNoteForGame(Events EventNote, int index)
+    {        
+        switch (EventNote.Type)
+        {
+            case BeatSaberEventType.TopLeftRightLazers:
+                switch((BeatSaberEventColorType)EventNote.Value)
+                {
+                    case BeatSaberEventColorType.LightsOff: 
+                        foreach (Renderer light in mainManager.gameManager.TopLeftRightLazers)
+                        {
+                            light.material = mainManager.gameManager.LightOff;
+                        }
+                        break;
+                    case BeatSaberEventColorType.Blue:
+                    case BeatSaberEventColorType.BlueUnk:
+                    case BeatSaberEventColorType.Bluefade:
+                        foreach (Renderer light in mainManager.gameManager.TopLeftRightLazers)
+                        {
+                            light.material = mainManager.gameManager.BlueMaterial;
+                        }
+                        break;
+                    case BeatSaberEventColorType.Red:
+                    case BeatSaberEventColorType.RedUnk:
+                    case BeatSaberEventColorType.RedFade:
+                        foreach (Renderer light in mainManager.gameManager.TopLeftRightLazers)
+                        {
+                            light.material = mainManager.gameManager.RedMaterial;
+                        }
+                        break;                    
+                }
+                break;
+            case BeatSaberEventType.RightLazer:
+                switch ((BeatSaberEventColorType)EventNote.Value)
+                {
+                    case BeatSaberEventColorType.LightsOff:
+                        foreach (Renderer light in mainManager.gameManager.RightLazers)
+                        {
+                            light.material = mainManager.gameManager.LightOff;
+                        }
+                        break;
+                    case BeatSaberEventColorType.Blue:
+                    case BeatSaberEventColorType.BlueUnk:
+                    case BeatSaberEventColorType.Bluefade:
+                        foreach (Renderer light in mainManager.gameManager.RightLazers)
+                        {
+                            light.material = mainManager.gameManager.BlueMaterial;
+                        }
+                        break;
+                    case BeatSaberEventColorType.Red:
+                    case BeatSaberEventColorType.RedUnk:
+                    case BeatSaberEventColorType.RedFade:
+                        foreach (Renderer light in mainManager.gameManager.RightLazers)
+                        {
+                            light.material = mainManager.gameManager.RedMaterial;
+                        }
+                        break;
+                }
+                break;
+            case BeatSaberEventType.LeftLazer:
+                switch ((BeatSaberEventColorType)EventNote.Value)
+                {
+                    case BeatSaberEventColorType.LightsOff:
+                        foreach (Renderer light in mainManager.gameManager.LeftLazers)
+                        {
+                            light.material = mainManager.gameManager.LightOff;
+                        }
+                        break;
+                    case BeatSaberEventColorType.Blue:
+                    case BeatSaberEventColorType.BlueUnk:
+                    case BeatSaberEventColorType.Bluefade:
+                        foreach (Renderer light in mainManager.gameManager.LeftLazers)
+                        {
+                            light.material = mainManager.gameManager.BlueMaterial;
+                        }
+                        break;
+                    case BeatSaberEventColorType.Red:
+                    case BeatSaberEventColorType.RedUnk:
+                    case BeatSaberEventColorType.RedFade:
+                        foreach (Renderer light in mainManager.gameManager.LeftLazers)
+                        {
+                            light.material = mainManager.gameManager.RedMaterial;
+                        }
+                        break;
+                }
+                break;
+            case BeatSaberEventType.BackTopLazer:
+                switch (EventNote.Value)
+                {
+                    case 0:
+                        foreach (Renderer light in mainManager.gameManager.BackBottomLazers)
+                        {
+                            light.material = mainManager.gameManager.LightOff;
+                        }
+                        break;
+                    case 1:
+                    case 2:
+                        foreach (Renderer light in mainManager.gameManager.BackBottomLazers)
+                        {
+                            light.material = mainManager.gameManager.BlueMaterial;
+                        }
+                        break;
+                    case 5:
+                    case 6:
+                        foreach (Renderer light in mainManager.gameManager.BackBottomLazers)
+                        {
+                            light.material = mainManager.gameManager.RedMaterial;
+                        }
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+    }
 
     public void endSong()
     {
@@ -110,10 +231,8 @@ public class TwelveNoteGame : MonoBehaviour
         SubmitScores.WriteString(Exchange.currentGoodData.initialData.SongName);
         SubmitScores.WriteString(Exchange.currentGoodData.initialData.Artist);
         Exchange.mSocket.SendPacket(SubmitScores);*/
-        mainManager.saberBladeLeft.SetActive(true);
-        mainManager.saberBladeRight.SetActive(true);
-
-        
+        mainManager.saberBladeLeft.SetActive(false);
+        mainManager.saberBladeRight.SetActive(false);       
         mainManager.menus.SetActive(true);
         mainManager.gameManager.gameObject.SetActive(false);
         Destroy(gameObject);
@@ -135,6 +254,18 @@ public class TwelveNoteGame : MonoBehaviour
                 {
                     CreateNoteForGame(notes[noteIndex], noteIndex);
                     noteIndex++;
+                }
+
+                if (eventIndex < noteEvents.Count && (noteEvents[eventIndex].Time * secPerBeat) < timer && currentPlaybackSource.isPlaying)
+                {
+                    EventNoteForGame(noteEvents[eventIndex], eventIndex);
+                    eventIndex++;
+                }
+
+                if (obsticalIndex < noteObstilcales.Count && (noteObstilcales[obsticalIndex]._time * secPerBeat) < timer + (4 * secPerBeat) && currentPlaybackSource.isPlaying)
+                {
+                    ObstacleForGame(noteObstilcales[obsticalIndex], obsticalIndex);
+                    obsticalIndex++;
                 }
             }
 

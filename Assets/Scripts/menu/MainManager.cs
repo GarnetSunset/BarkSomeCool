@@ -25,7 +25,7 @@ public class MainManager : MonoBehaviour {
     public GameObject saberBladeLeft;
     public GameObject saberBladeRight;
     public GameObject songList;
-    public GameObject menus;
+    public GameObject menus;    
     public GameObject AudioObjects;
     public GameObject RightMenu;
     public GameObject SongObject;

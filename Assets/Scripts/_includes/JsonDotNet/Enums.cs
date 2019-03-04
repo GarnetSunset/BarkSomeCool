@@ -4,7 +4,7 @@
     TrackRingLazer = 1,
     LeftLazer = 2,
     RightLazer = 3,
-    BackBottom = 4,
+    TopLeftRightLazers = 4,
 
     TunnelRotation = 8,
     TunnelZooming = 9,
@@ -16,18 +16,14 @@
 
 public enum BeatSaberEventColorType
 {
-    LightEffect0 = 0,
-    LightEffect1 = 1,
-    LightEffect2 = 2,
+    LightsOff = 0,
+    Blue = 1,
+    BlueUnk = 2,
     Bluefade = 3,
-    LightEffect4 = 4,
-
+    unused = 4,
+    Red = 5,
+    RedUnk = 6,
     RedFade = 7,
-    TunnelZooming = 9,
-
-    MoveLight2 = 12,
-    MoveLight3 = 13
-
 }
 
 public enum _cutType
