@@ -123,18 +123,30 @@ public class TwelveNoteGame : MonoBehaviour
                         break;
                     case BeatSaberEventColorType.Blue:
                     case BeatSaberEventColorType.BlueUnk:
-                    case BeatSaberEventColorType.Bluefade:
                         foreach (Renderer light in mainManager.gameManager.TopLeftRightLazers)
                         {
                             light.material = mainManager.gameManager.BlueMaterial;
                         }
                         break;
+                    case BeatSaberEventColorType.Bluefade:
+                        foreach (Renderer light in mainManager.gameManager.TopLeftRightLazers)
+                        {
+                            light.material = mainManager.gameManager.BlueMaterial;
+                            StartCoroutine(FadeLight(light, mainManager.gameManager.LightOff));
+                        }
+                        break;
                     case BeatSaberEventColorType.Red:
                     case BeatSaberEventColorType.RedUnk:
+                        foreach (Renderer light in mainManager.gameManager.TopLeftRightLazers)
+                        {
+                            light.material = mainManager.gameManager.RedMaterial;
+                        }
+                        break;
                     case BeatSaberEventColorType.RedFade:
                         foreach (Renderer light in mainManager.gameManager.TopLeftRightLazers)
                         {
                             light.material = mainManager.gameManager.RedMaterial;
+                            StartCoroutine(FadeLight(light, mainManager.gameManager.LightOff));
                         }
                         break;                    
                 }
@@ -150,18 +162,30 @@ public class TwelveNoteGame : MonoBehaviour
                         break;
                     case BeatSaberEventColorType.Blue:
                     case BeatSaberEventColorType.BlueUnk:
-                    case BeatSaberEventColorType.Bluefade:
                         foreach (Renderer light in mainManager.gameManager.RightLazers)
                         {
                             light.material = mainManager.gameManager.BlueMaterial;
                         }
                         break;
+                    case BeatSaberEventColorType.Bluefade:
+                        foreach (Renderer light in mainManager.gameManager.RightLazers)
+                        {
+                            light.material = mainManager.gameManager.BlueMaterial;
+                            StartCoroutine(FadeLight(light, mainManager.gameManager.LightOff));
+                        }
+                        break;
                     case BeatSaberEventColorType.Red:
                     case BeatSaberEventColorType.RedUnk:
+                        foreach (Renderer light in mainManager.gameManager.RightLazers)
+                        {
+                            light.material = mainManager.gameManager.RedMaterial;
+                        }
+                        break;
                     case BeatSaberEventColorType.RedFade:
                         foreach (Renderer light in mainManager.gameManager.RightLazers)
                         {
                             light.material = mainManager.gameManager.RedMaterial;
+                            StartCoroutine(FadeLight(light, mainManager.gameManager.LightOff));
                         }
                         break;
                 }
@@ -177,49 +201,85 @@ public class TwelveNoteGame : MonoBehaviour
                         break;
                     case BeatSaberEventColorType.Blue:
                     case BeatSaberEventColorType.BlueUnk:
-                    case BeatSaberEventColorType.Bluefade:
                         foreach (Renderer light in mainManager.gameManager.LeftLazers)
                         {
                             light.material = mainManager.gameManager.BlueMaterial;
                         }
                         break;
+                    case BeatSaberEventColorType.Bluefade:
+                        foreach (Renderer light in mainManager.gameManager.LeftLazers)
+                        {
+                            light.material = mainManager.gameManager.BlueMaterial;
+                            StartCoroutine(FadeLight(light, mainManager.gameManager.LightOff));
+                        }
+                        break;
                     case BeatSaberEventColorType.Red:
                     case BeatSaberEventColorType.RedUnk:
+                        foreach (Renderer light in mainManager.gameManager.LeftLazers)
+                        {
+                            light.material = mainManager.gameManager.RedMaterial;
+                        }
+                        break;
                     case BeatSaberEventColorType.RedFade:
                         foreach (Renderer light in mainManager.gameManager.LeftLazers)
                         {
                             light.material = mainManager.gameManager.RedMaterial;
+                            StartCoroutine(FadeLight(light, mainManager.gameManager.LightOff));
                         }
                         break;
                 }
                 break;
             case BeatSaberEventType.BackTopLazer:
-                switch (EventNote.Value)
+                switch ((BeatSaberEventColorType)EventNote.Value)
                 {
-                    case 0:
+                    case BeatSaberEventColorType.LightsOff:
                         foreach (Renderer light in mainManager.gameManager.BackBottomLazers)
                         {
                             light.material = mainManager.gameManager.LightOff;
                         }
                         break;
-                    case 1:
-                    case 2:
+                    case BeatSaberEventColorType.Blue:
+                    case BeatSaberEventColorType.BlueUnk:
                         foreach (Renderer light in mainManager.gameManager.BackBottomLazers)
                         {
                             light.material = mainManager.gameManager.BlueMaterial;
                         }
                         break;
-                    case 5:
-                    case 6:
+                    case BeatSaberEventColorType.Bluefade:
+                        foreach (Renderer light in mainManager.gameManager.BackBottomLazers)
+                        {
+                            light.material = mainManager.gameManager.BlueMaterial;
+                            StartCoroutine(FadeLight(light, mainManager.gameManager.LightOff));
+                        }
+                        break;
+                    case BeatSaberEventColorType.Red:
+                    case BeatSaberEventColorType.RedUnk:
                         foreach (Renderer light in mainManager.gameManager.BackBottomLazers)
                         {
                             light.material = mainManager.gameManager.RedMaterial;
+                        }
+                        break;
+                    case BeatSaberEventColorType.RedFade:
+                        foreach (Renderer light in mainManager.gameManager.BackBottomLazers)
+                        {
+                            light.material = mainManager.gameManager.RedMaterial;
+                            StartCoroutine(FadeLight(light, mainManager.gameManager.LightOff));
                         }
                         break;
                 }
                 break;
             default:
                 break;
+        }
+    }
+
+    IEnumerator FadeLight(Renderer light, Material mat)
+    {
+        Material oldMat = light.material;
+        for (float i = 0; i <= 1; i += Time.deltaTime)
+        {
+            light.material.Lerp(oldMat, mat, i);
+            yield return null;
         }
     }
 

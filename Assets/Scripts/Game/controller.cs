@@ -15,6 +15,7 @@ public class controller : MonoBehaviour {
     public Hand handColor;
     public Material crossMat;
     NoteJump hitNote;
+    Vector3 hitSpeed;
     VelocityEstimator velocityEstimator;
     // Use this for initialization
     void Start () {
@@ -54,8 +55,7 @@ public class controller : MonoBehaviour {
     {
         if (other.name == "Box")
         {
-            velocityEstimator.BeginEstimatingVelocity();
-
+            velocityEstimator.BeginEstimatingVelocity();            
             hitNote = null;
 
             mainManager.Vibrate(Controller, device);
@@ -74,31 +74,35 @@ public class controller : MonoBehaviour {
                 if (comp.GetType() == typeof(NoteJump))
                 {
                     hitNote = comp as NoteJump;
-
-                    if(hitNote.note._type != handColor)
+                    
+                    if (hitNote.note._type == handColor)
                     {
-                        mainManager.gameManager.UpdateScore(true); //Wrong Color
+                        hitSpeed = velocityEstimator.speed;
 
-                        //Play a wrong hit sound here
-                        return;
-                    }
-
-                    if(correctHit(hitNote.note._cutDirection))
-                    {
-                        mainManager.gameManager.UpdateScore(false);
+                        if (correctHit(hitNote.note._cutDirection))
+                        {
+                            mainManager.gameManager.UpdateScore(false);
+                        }
+                        else
+                        {
+                            //Play a wrong hit sound here
+                            mainManager.gameManager.UpdateScore(true);
+                        }
                     }
                     else
                     {
+                        //Play a wrong hit sound here
                         mainManager.gameManager.UpdateScore(true);
                     }
-
+                    
                     hitNote.gameObject.SetActive(false);
+                    
                 }
             }
         }
 
     }
-
+    
     public bool correctHit(_cutType type)
     {
         switch(type)
@@ -106,21 +110,21 @@ public class controller : MonoBehaviour {
             case _cutType._any:
                 return true;
             case _cutType._bottomLeft:                
-                return (velocityEstimator.speed.y > 0.2f) && (velocityEstimator.speed.x < -0.2f);
+                return (hitSpeed.y > 0f) && (hitSpeed.x < 0f);
             case _cutType._bottomRight:                
-                return (velocityEstimator.speed.y > 0.2f) && (velocityEstimator.speed.x > 0.2f);
+                return (hitSpeed.y > 0f) && (hitSpeed.x > 0f);
             case _cutType._down:
-                return (velocityEstimator.speed.y < -0.2f);
+                return (hitSpeed.y < 0f);
             case _cutType._left:
-                return (velocityEstimator.speed.x < -0.2f);
+                return (hitSpeed.x < 0f);
             case _cutType._right:
-                return (velocityEstimator.speed.x > 0.2f);
+                return (hitSpeed.x > 0f);
             case _cutType._topLeft:
-                return (velocityEstimator.speed.y < -0.2f) && (velocityEstimator.speed.x < -0.2f);
+                return (hitSpeed.y < 0f) && (hitSpeed.x < 0f);
             case _cutType._topRight:
-                return (velocityEstimator.speed.y < -0.2f) && (velocityEstimator.speed.x > 0.2f);
+                return (hitSpeed.y < 0f) && (hitSpeed.x > 0f);
             case _cutType._up:
-                return (velocityEstimator.speed.y > 0.2f);
+                return (hitSpeed.y > 0f);
             default:
                 return false;
         }

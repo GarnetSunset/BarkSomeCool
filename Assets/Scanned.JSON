@@ -1,0 +1,53 @@
+{
+  "GoodSongs": [
+    {
+      "ID": 0,
+      "initialData": {
+        "Artist": "Avicii",
+        "SongName": "Hey Brother",
+        "Charter": "(Beatmap by Chandoggie)",
+        "Album": "Album Unknown",
+        "offset": 0,
+        "PreviewStartTime": 34
+      },
+      "_chartLocation": "D:/clone/Assets/Songs/Avicii - Hey Brother\\info.json"
+    },
+    {
+      "ID": 1,
+      "initialData": {
+        "Artist": "DJ YOSHITAKA",
+        "SongName": "FLOWER (Swapped Cube Colors)",
+        "Charter": " (Swapped Cube Colors)",
+        "Album": "Album Unknown",
+        "offset": 0,
+        "PreviewStartTime": 50
+      },
+      "_chartLocation": "D:/clone/Assets/Songs/FLOWER\\info.JSON"
+    },
+    {
+      "ID": 2,
+      "initialData": {
+        "Artist": "| Mapped By G33ke |",
+        "SongName": "One Click Headshot",
+        "Charter": "- Feed Me",
+        "Album": "Album Unknown",
+        "offset": 140,
+        "PreviewStartTime": 56
+      },
+      "_chartLocation": "D:/clone/Assets/Songs/One Click Headshot\\info.json"
+    },
+    {
+      "ID": 3,
+      "initialData": {
+        "Artist": "Gummi Hunter",
+        "SongName": "Without You (Arcade Game Style)",
+        "Charter": "Avicii (Afishal Remix)",
+        "Album": "Album Unknown",
+        "offset": 69,
+        "PreviewStartTime": 12
+      },
+      "_chartLocation": "D:/clone/Assets/Songs/Without You\\info.json"
+    }
+  ],
+  "BadSongs": []
+}
