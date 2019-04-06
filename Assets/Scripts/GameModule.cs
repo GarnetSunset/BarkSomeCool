@@ -21,6 +21,7 @@ public class GameModule : MonoBehaviour
     public GameObject Lpos;
     public GameObject Rpos;
     public GameObject FailBar;
+    public GameObject NotesParent;
     public TextMesh pointsObject;
     public TextMesh timeObject;
     public TextMesh streakObject;
@@ -69,7 +70,7 @@ public class GameModule : MonoBehaviour
             if (mainManager.gameManager.failPoints > 2)
             {
                 mainManager.gameManager.failPoints = mainManager.gameManager.failPoints - 4;
-                mainManager.gameManager.FailBar.transform.localScale = new Vector3(mainManager.gameManager.failPoints / 100f, mainManager.gameManager.FailBar.transform.localScale.y, mainManager.gameManager.FailBar.transform.localScale.z);
+                mainManager.gameManager.FailBar.transform.localScale = new Vector3((mainManager.gameManager.failPoints * 2) / 100f, 0.0013125f, 0.3125f);
             }
             else
             {
@@ -87,7 +88,7 @@ public class GameModule : MonoBehaviour
             if (mainManager.gameManager.failPoints < 100)
             {
                 mainManager.gameManager.failPoints = mainManager.gameManager.failPoints + 2;
-                mainManager.gameManager.FailBar.transform.localScale = new Vector3(mainManager.gameManager.failPoints / 100f, 0.025051f, 0.024915f);
+                mainManager.gameManager.FailBar.transform.localScale = new Vector3((mainManager.gameManager.failPoints * 2) / 100f, 0.0013125f, 0.3125f);
             }
         }
 

@@ -8,13 +8,7 @@ public class NoteJump : MonoBehaviour
 {
     public int noteIndex;
     public NoteData note;
-    public Vector3 startPos;
-    public Vector3 secondStartPos;
-    public bool isTop = false;
-    public bool isConnected = false;
-    public float lerpTime;
-    public float currentLerpTime;
-    public float secondLerpTime;
+        
     public Color startColor;
     public Color endColor;
     public Hand currentColor;
@@ -22,6 +16,12 @@ public class NoteJump : MonoBehaviour
     public Renderer ringRenderer;
     public Renderer lightingRenderer;
     GameObject noteGO;
+
+    public Vector3 startPos;
+    public Vector3 secondStartPos;
+    public float lerpTime;
+    public float currentLerpTime;
+    public float secondLerpTime;
     float perc = 0;
     float sexondPerc = 0;
     bool canUpdate = true;
@@ -78,50 +78,11 @@ public class NoteJump : MonoBehaviour
         return tmp;
     }
 
-    public void doHitCheck()
-    {
-        /*if (hitPad.hitTime <= ((float)note._time * jsonGame.secPerBeat) && hitPad.hitTime >= ((float)note._time * jsonGame.secPerBeat) - (0.2f * jsonGame.secPerBeat)) // Early hit
-        {
-            hitPad.jumpingNotes.Remove(this);
-
-            if (hitPad.lastController.handColor != note._type)
-            {
-                Color newendColor = new Color(0.1320755f, 0.1320755f, 0.1320755f, 1f);
-                mainManager.gameManager.UpdateScore(true);
-            }
-            else
-            {
-                mainManager.gameManager.UpdateScore(false);
-
-                gameObject.transform.localScale = new Vector3(0.5f, 0.02f, 0.5f);
-                gameObject.SetActive(false);
-
-            }
-
-            if (hitPad.hitTime <= ((float)note._time * jsonGame.secPerBeat) + (0.2f * jsonGame.secPerBeat) && hitPad.hitTime >= (float)note._time * jsonGame.secPerBeat) // late hit
-            {
-                hitPad.jumpingNotes.Remove(this);
-
-                if (hitPad.lastController.handColor != note._type)
-                {
-                    Color newendColor = new Color(0.1320755f, 0.1320755f, 0.1320755f, 1f);
-                    mainManager.gameManager.UpdateScore(true);
-                }
-                else
-                {
-                    mainManager.gameManager.UpdateScore(false);
-                }
-
-                gameObject.transform.localScale = new Vector3(0.5f, 0.02f, 0.5f);
-                gameObject.SetActive(false);
-
-            }*/
-    }
-    
+        
     // Update is called once per frame
     void FixedUpdate()
     {
-        lerpTime = (4 * TwelveNoteGame.secPerBeat) / currentPlaybackSource.pitch;
+        //lerpTime = (4 * TwelveNoteGame.secPerBeat) / currentPlaybackSource.pitch;
 
         if (perc == 1)
         {

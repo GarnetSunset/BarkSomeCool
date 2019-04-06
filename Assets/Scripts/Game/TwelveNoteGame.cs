@@ -23,7 +23,6 @@ public class TwelveNoteGame : MonoBehaviour
     public bool paused = false;
     public static bool playtrack = false;
     float pauseSeconds = 0;
-    public bool isStar = false;
 
     // Use this for initialization
     void Start()
@@ -88,19 +87,19 @@ public class TwelveNoteGame : MonoBehaviour
     {
         if (note._type == Hand.blue)
         {
-            Spawner.SpawnPurpleNote(note, index, isStar);
+            Spawner.SpawnBlueNote(note, index);
             return;
         }
 
         if (note._type == Hand.red)
         {
-            Spawner.SpawnRedNote(note, index, isStar);
+            Spawner.SpawnRedNote(note, index);
             return;
         }
 
         if (note._type == Hand.Bomb)
         {
-            //Spawner.SpawnWhiteNote(note, index, isStar);
+            Spawner.SpawnBombNote(note, index);
             return;
         }
     }
@@ -291,6 +290,17 @@ public class TwelveNoteGame : MonoBehaviour
         SubmitScores.WriteString(Exchange.currentGoodData.initialData.SongName);
         SubmitScores.WriteString(Exchange.currentGoodData.initialData.Artist);
         Exchange.mSocket.SendPacket(SubmitScores);*/
+
+        Transform[] ts = mainManager.gameManager.NotesParent.transform.GetComponentsInChildren<Transform>(true);
+        foreach (Transform t in ts)
+        {
+            if (t.gameObject.name == "Notes")
+            {
+                continue;
+            }
+
+            t.gameObject.SetActive(false);
+        }
         mainManager.saberBladeLeft.SetActive(false);
         mainManager.saberBladeRight.SetActive(false);       
         mainManager.menus.SetActive(true);
