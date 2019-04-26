@@ -1,5 +1,7 @@
 # BeatSaberClone
 
+### Just in case the main repo goes down, gonna make this little fork, renaming it to something nice too.
+
 Join The Discord!
 https://discord.gg/25ZBETq
 
